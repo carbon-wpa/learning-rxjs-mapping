@@ -124,5 +124,8 @@
       }
     }
   },
-  "defaultProject": "learning-rxjs-mapping"
+  "defaultProject": "learning-rxjs-mapping",
+  "cli": {
+    "analytics": false
+  }
 }
