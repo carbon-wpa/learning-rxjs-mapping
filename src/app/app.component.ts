@@ -1,7 +1,6 @@
 import { AfterViewInit, Component, ViewChild } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 import { fromEvent, Observable } from 'rxjs';
-import { exhaustMap, tap } from 'rxjs/operators';
+import { map, mergeMap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-root',
@@ -10,27 +9,34 @@ import { exhaustMap, tap } from 'rxjs/operators';
 })
 export class AppComponent implements AfterViewInit {
 
-  @ViewChild('button') button;
+  @ViewChild('input1') input1;
 
-  btnClick$: Observable<any>;
+  @ViewChild('input2') input2;
 
-  public clickedTimes = 0;
+  input1$: Observable<any>;
+  input2$: Observable<any>;
 
-  constructor(public http: HttpClient) {
+
+  constructor() {
   }
 
   ngAfterViewInit(): void {
-    this.btnClick$ = fromEvent(this.button.nativeElement, 'click');
+    this.input1$ = fromEvent(this.input1.nativeElement, 'keydown');
+    this.input2$ = fromEvent(this.input2.nativeElement, 'keydown');
 
-    this.btnClick$
+    this.input1$
       .pipe(
-        tap(() => this.clickedTimes++),
-        exhaustMap(event => {
-          console.log('----> ', event);
-          return this.http.get('https://60295804289eb50017cf796d.mockapi.io/testData');
-        })
+        map(event => event.target.value),
+        mergeMap(
+          value => this.input2$.pipe(
+            map(event2 => value + ' ---- ' + event2.target.value)
+          )
+        )
       )
-      .subscribe(console.log);
+      .subscribe(
+        console.log
+      );
+
   }
 
 }
