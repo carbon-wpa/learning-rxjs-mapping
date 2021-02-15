@@ -1,7 +1,7 @@
 import { AfterViewInit, Component, ViewChild } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { fromEvent, Observable } from 'rxjs';
-import { switchMap } from 'rxjs/operators';
+import { exhaustMap, tap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-root',
@@ -14,6 +14,8 @@ export class AppComponent implements AfterViewInit {
 
   btnClick$: Observable<any>;
 
+  public clickedTimes = 0;
+
   constructor(public http: HttpClient) {
   }
 
@@ -22,7 +24,8 @@ export class AppComponent implements AfterViewInit {
 
     this.btnClick$
       .pipe(
-        switchMap(event => {
+        tap(() => this.clickedTimes++),
+        exhaustMap(event => {
           console.log('----> ', event);
           return this.http.get('https://60295804289eb50017cf796d.mockapi.io/testData');
         })
