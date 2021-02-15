@@ -1,24 +1,33 @@
-import { Component } from '@angular/core';
+import { AfterViewInit, Component, ViewChild } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { map, mapTo } from 'rxjs/operators';
+import { fromEvent, Observable } from 'rxjs';
+import { switchMap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
-export class AppComponent {
+export class AppComponent implements AfterViewInit {
+
+  @ViewChild('button') button;
+
+  btnClick$: Observable<any>;
 
   constructor(public http: HttpClient) {
   }
 
-  public onBtnClick(): void {
-    this.http.get('https://60295804289eb50017cf796d.mockapi.io/testData')
+  ngAfterViewInit(): void {
+    this.btnClick$ = fromEvent(this.button.nativeElement, 'click');
+
+    this.btnClick$
       .pipe(
-        mapTo(true)
+        switchMap(event => {
+          console.log('----> ', event);
+          return this.http.get('https://60295804289eb50017cf796d.mockapi.io/testData');
+        })
       )
-      .subscribe(
-        console.log
-      );
+      .subscribe(console.log);
   }
+
 }
